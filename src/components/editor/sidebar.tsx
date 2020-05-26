@@ -1,3 +1,4 @@
+import { useMediaQuery } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
 import { DrawingTool, quickMasks, QuickMaskType, Tools } from '../../model/drawing';
@@ -73,6 +74,8 @@ function ToolsView(props: {
         }
     }
 
+    const maxHeight700 = useMediaQuery('(max-height:700px)');
+
     return (
         <div className='tools' style={{
             display: 'flex',
@@ -80,20 +83,33 @@ function ToolsView(props: {
             alignItems: 'center',
         }}>
             <ToolGroup>
-                {createTool(Tools.Brush)}
-                {createTool(Tools.Erase)}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: maxHeight700 ? 'row' : 'column',
+                }}>
+                    {createTool(Tools.Brush)}
+                    {createTool(Tools.Erase)}
+                </div>
                 <div style={{
                     fontFamily: 'var(--monospace-font-family)',
                     fontSize: '12px',
                 }}>stoke={props.editorState.drawSettings.strokeSize}px</div>
             </ToolGroup>
+
             <ToolGroup>
-                {createTool(Tools.Line)}
-                {createTool(Tools.Move)}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: maxHeight700 ? 'row' : 'column',
+                }}>
+                    {createTool(Tools.Line)}
+                    {createTool(Tools.Move)}
+                </div>
             </ToolGroup>
+
             <ToolGroup>
                 <QuickMask dispatch={props.dispatch} />
             </ToolGroup>
+
             <ToolGroup>
                 <div>
                     x=<input style={{ maxWidth: '40px' }}
@@ -153,7 +169,7 @@ function Tool(props: {
                 border: '2px solid lightgrey',
                 borderRadius: '100px',
                 backgroundColor: props.selected ? 'var(--brand-color)' : '',
-                margin: '0.4em 0',
+                margin: '0.4em',
                 backgroundImage: `url(${props.tool.icon})`,
                 backgroundSize: '60%',
                 backgroundRepeat: 'no-repeat',

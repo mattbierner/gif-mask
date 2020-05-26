@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { GifEditor } from '../components/editor';
+import { SiteFooter } from '../components/siteFooter';
 import { Timeline } from '../components/timeline';
 import { loadGif } from '../load_gif';
 import { AppStage, Loading } from '../model/appState';
@@ -67,9 +68,10 @@ export function CreateView(): React.ReactElement {
 
     return (
         <div style={{
-            flex: '1',
+            height: '100vh',
+            width: '100%',
             display: 'grid',
-            gridTemplateRows: '1fr auto',
+            gridTemplateRows: '1fr auto auto',
         }}>
             <GifEditor
                 dispatch={dispatch}
@@ -79,6 +81,8 @@ export function CreateView(): React.ReactElement {
             <Timeline
                 dispatch={dispatch}
                 state={state} />
+
+            <SiteFooter />
         </div>
     );
 }

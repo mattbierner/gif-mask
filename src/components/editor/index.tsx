@@ -359,6 +359,7 @@ class EditorArea extends React.Component<{
                 display: 'flex',
                 flex: 1,
                 overflow: 'scroll',
+                overflowY: 'scroll',
                 userSelect: 'none',
                 border: '10px solid transparent',
             }}>
