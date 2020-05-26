@@ -16,7 +16,8 @@
   "scripts": {
     "build": "webpack",
     "build:prod": "webpack --env.production",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "update-gh-pages": "git checkout gh-pages && git merge master && npm run build:prod"
   },
   "devDependencies": {
     "@types/debounce-promise": "^3.1.2",
