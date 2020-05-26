@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2018",
+        "jsx": "react",
+        "baseUrl": "src",
+        "allowJs": true,
+        "checkJs": false,
+        "outDir": "./js/",
+        "sourceMap": true,
+        "strict": true,
+        "noUnusedLocals": true
+    },
+    "exclude": [
+        "node_modules",
+        "**/node_modules/*"
+    ],
+    "include": [
+        "src/**/*"
+    ]
+}

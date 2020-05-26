@@ -1,0 +1,27 @@
+# Project Files #
+#################
+.project
+node_modules
+
+# OS Files #
+############
+.DS_Store*
+ehthumbs.db
+Thumbs.db
+
+# Temp Files #
+##############
+*~
+*.tmp*
+*.orig
+*.cache
+*.log
+
+
+# Jekyll #
+##########
+_site/
+
+.vscode
+.sass-cache
+js/*

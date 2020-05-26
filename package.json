@@ -1,0 +1,58 @@
+{
+  "name": "gif-mask",
+  "private": true,
+  "version": "0.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattbierner/gif-mask.git"
+  },
+  "keywords": [],
+  "author": "Matt Bierner (https://mattbierner.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mattbierner/gif-mask/issues"
+  },
+  "scripts": {
+    "build": "webpack",
+    "build:prod": "webpack --env.production",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
+  },
+  "devDependencies": {
+    "@types/debounce-promise": "^3.1.2",
+    "@types/node": "^12.0.0",
+    "@types/omggif": "^1.0.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-dropzone": "^4.2.0",
+    "@types/react-router": "^4.0.21",
+    "@types/react-router-dom": "^4.2.3",
+    "@types/styled-components": "^5.1.0",
+    "@typescript-eslint/eslint-plugin": "^3.0.1",
+    "@typescript-eslint/parser": "^3.0.1",
+    "eslint": "^7.1.0",
+    "imports-loader": "^0.8.0",
+    "terser-webpack-plugin": "^3.0.1",
+    "ts-loader": "^7.0.0",
+    "typescript": "^3.9.3",
+    "webpack": "^4.43.0",
+    "@types/lodash.throttle": "^4.1.6",
+    "webpack-cli": "^3.3.0"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.10.0",
+    "giphy-api": "^2.0.0",
+    "localforage": "^1.7.3",
+    "lodash.throttle": "^4.1.1",
+    "omggif": "^1.0.9",
+    "react": "^16.13.1",
+    "react-dnd": "^11.0.0",
+    "react-dnd-html5-backend": "^11.0.0",
+    "react-dom": "^16.13.0",
+    "react-dropzone": "^11.0.1",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "styled-components": "^5.1.0",
+    "use-resize-observer": "^6.1.0"
+  }
+}

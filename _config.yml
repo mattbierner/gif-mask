@@ -1,0 +1,21 @@
+title: "Gif Mask"
+
+description: "Combine gifs using bitmasks"
+
+# Build settings
+markdown: kramdown
+
+exclude: [
+    "documentation",
+    "design",
+    "node_modules",
+    "process_data",
+    "server",
+    "src",
+    "webpack.config.js",
+    "package.json",
+    "package-lock.json",
+    "README.md",
+    "tsconfig.json",
+    "LICENSE"
+]
