@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { getGiphy } from '../../giphy';
-import { useFocus } from '../../util/useFocus';
 import { LoadingSpinner } from '../loading_spinner';
 
 interface GiphyGifData {
@@ -85,7 +84,7 @@ interface GifSearchBarProps {
  * Search bar for entering text
  */
 function GifSearchBar(props: GifSearchBarProps) {
-    const [inputRef] = useFocus();
+    const inputRef = React.useRef<HTMLInputElement>();
 
     const onSearch = React.useCallback(() => {
         props.onSearch(props.searchText);
@@ -97,11 +96,15 @@ function GifSearchBar(props: GifSearchBarProps) {
         }
     }, []);
 
+    React.useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+
     return (
         <div className="gif-search-bar content-wrapper">
             <button onMouseDown={onSearch}><span className="material-icons">search</span></button>
             <input type='text'
-                ref={inputRef}
+                ref={inputRef as React.Ref<HTMLInputElement>}
                 value={props.searchText}
                 placeholder="find a gif"
                 onKeyPress={onKeyPress}
