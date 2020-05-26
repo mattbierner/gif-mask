@@ -54,8 +54,8 @@ export function CreateView(): React.ReactElement {
             } else {
                 dispatch(new actions.Loaded(EditorState.empty));
 
-                loadGif('/images/example.gif').then(gif => {
-                    loadGif('/images/example2.gif').then(gif2 => {
+                loadGif('images/example.gif').then(gif => {
+                    loadGif('images/example2.gif').then(gif2 => {
                         dispatch(new actions.AddLayer(gif2));
                     });
 

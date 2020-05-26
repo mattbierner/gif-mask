@@ -21,28 +21,28 @@ export class Tools {
     static readonly Brush: DrawingTool = {
         type: DrawingToolType.Brush,
         title: "Brush",
-        icon: '/images/icons/brush.svg',
+        icon: 'images/icons/brush.svg',
         key: 'b',
     };
 
     static readonly Erase: DrawingTool = {
         type: DrawingToolType.Erase,
         title: "Erase",
-        icon: '/images/icons/eraser.svg',
+        icon: 'images/icons/eraser.svg',
         key: 'e',
     };
 
     static readonly Line: DrawingTool = {
         type: DrawingToolType.Line,
         title: "Line",
-        icon: '/images/icons/ruler.svg',
+        icon: 'images/icons/ruler.svg',
         key: 'g',
     };
 
     static readonly Move: DrawingTool = {
         type: DrawingToolType.Move,
         title: "Move",
-        icon: '/images/icons/move.svg',
+        icon: 'images/icons/move.svg',
         key: 'v',
     };
 }

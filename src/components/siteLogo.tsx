@@ -10,7 +10,7 @@ export function SiteLogo() {
                 <img
                     id='site-title'
                     className='site-logo'
-                    src='/images/logo.svg'
+                    src='images/logo.svg'
                     alt={config.siteTitle}
                     style={{
                         width: '100%'

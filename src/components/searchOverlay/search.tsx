@@ -283,7 +283,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
                     <a href='http://giphy.com/' style={{
                         margin: '1em',
                     }}>
-                        <img src='/images/PoweredBy_200px-White_HorizText.png' alt='Powered by Giphy' />
+                        <img src='images/PoweredBy_200px-White_HorizText.png' alt='Powered by Giphy' />
                     </a>
                 </div>
             </div>
