@@ -35,7 +35,7 @@ export function ExportButton(props: {
         for (let i = 0; i < frameCount; ++i) {
             render(props.editorState.doc, i, 1, ctx);
             const imageData = ctx.getImageData(0, 0, width, height);
-            const delay = props.editorState.doc.baseLayer!.getFrame(i, frameCount)?.info.delay ?? 10;
+            const delay = (props.editorState.doc.baseLayer!.getFrame(i, frameCount)?.info.delay ?? 3) * 10;
             encoder.addFrame(imageData, delay);
         }
 
