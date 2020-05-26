@@ -10,10 +10,10 @@ export enum RenderMode {
 }
 
 export interface PlaybackSettings {
-    renderMode: RenderMode;
-    zoom: number;
-    currentFrameIndex: number;
-    playing: boolean;
+    readonly renderMode: RenderMode;
+    readonly zoom: number;
+    readonly currentFrameIndex: number;
+    readonly playing: boolean;
 }
 
 export class EditorState {

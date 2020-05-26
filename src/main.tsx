@@ -7,7 +7,6 @@ import { CreateView } from './views/main';
 function App() {
     return (
         <DndProvider backend={HTML5Backend}>
-
             <CreateView />
         </DndProvider>
     );

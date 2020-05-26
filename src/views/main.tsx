@@ -55,13 +55,13 @@ export function CreateView(): React.ReactElement {
             } else {
                 dispatch(new actions.Loaded(EditorState.empty));
 
-                loadGif('images/example.gif').then(gif => {
-                    loadGif('images/example2.gif').then(gif2 => {
-                        dispatch(new actions.AddLayer(gif2));
-                    });
-
-                    dispatch(new actions.AddLayer(gif));
-                });
+                const [rainbow, cage] = await Promise.all([
+                    loadGif('images/example/rainbow.gif'),
+                    loadGif('images/example/cage.gif'),
+                ]);
+                dispatch(new actions.AddLayer(rainbow));
+                dispatch(new actions.AddLayer(cage));
+                dispatch(new actions.SetPlaying(true));
             }
         });
     }, []);
