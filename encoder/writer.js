@@ -1,4 +1,4 @@
-importScripts('/encoder/encoder.js');
+importScripts('encoder/encoder.js');
 
 let initialized = false;
 let opts;

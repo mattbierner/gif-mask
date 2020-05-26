@@ -6,7 +6,7 @@ export function SiteLogo() {
         <header className='site-header' style={{
             marginBottom: '1em',
         }}>
-            <a href='/' title={config.siteTitle}>
+            <a href='.' title={config.siteTitle}>
                 <img
                     id='site-title'
                     className='site-logo'
