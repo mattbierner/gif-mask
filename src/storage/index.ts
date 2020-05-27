@@ -119,6 +119,7 @@ export class Storage {
                 serializedLayer.position,
                 serializedLayer.scale ?? { x: 1, y: 1 },
                 serializedLayer.frameSampleMode,
+                !!serializedLayer.hidden,
                 undefined);
 
             if (gif) {

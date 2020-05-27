@@ -183,6 +183,14 @@ export function LayerView(props: {
                     <Icon>search</Icon>
                 </TimelineControl>
 
+                <TimelineControl title="Visible"
+                    onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        props.dispatch(new actions.ToggleLayerVisibility(props.layer.id));
+                    }}>
+                    <Icon>{props.layer.hidden ? 'visibility_off' : 'visibility'}</Icon>
+                </TimelineControl>
+
                 <TimelineControl title="Show mask"
                     className={props.active && props.renderMode === RenderMode.ActiveMask ? 'active' : ''}
                     onClick={(e: React.MouseEvent) => {

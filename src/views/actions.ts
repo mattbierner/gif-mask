@@ -15,8 +15,10 @@ export enum ActionType {
     SetLayerGif,
 
     UpdateDrawing,
-    ToggleMaskRendering,
     ChangeZoom,
+
+    ToggleMaskRendering,
+    ToggleLayerVisibility,
 
     SetPlaying,
     SetActiveFrame,
@@ -97,6 +99,14 @@ export class ToggleMaskRendering {
     ) { }
 }
 
+export class ToggleLayerVisibility {
+    public readonly type = ActionType.ToggleLayerVisibility;
+
+    constructor(
+        public readonly target: LayerId,
+    ) { }
+}
+
 export class ChangeZoom {
     public readonly type = ActionType.ChangeZoom;
 
@@ -140,6 +150,7 @@ export type Actions =
     | SetLayerGif
     | UpdateDrawing
     | ToggleMaskRendering
+    | ToggleLayerVisibility
     | ChangeZoom
     | SetPlaying
     | SetActiveFrame

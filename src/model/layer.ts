@@ -34,7 +34,7 @@ export class Layer {
         id: LayerId,
         gif: Gif | undefined,
     ): Layer {
-        return new Layer(id, gif, vecZero, { x: 1, y: 1 }, FrameSampleMode.Repeat, undefined);
+        return new Layer(id, gif, vecZero, { x: 1, y: 1 }, FrameSampleMode.Repeat, false, undefined);
     }
 
     readonly #mask: HTMLCanvasElement;
@@ -48,6 +48,7 @@ export class Layer {
         public readonly position: Vec,
         public scale: Vec,
         public readonly frameSampleMode: FrameSampleMode,
+        public readonly hidden: boolean,
         mask: HTMLCanvasElement | undefined,
     ) {
         this.#mask = mask ?? document.createElement('canvas');
@@ -82,7 +83,7 @@ export class Layer {
     public get height(): number { return this.gif?.height ?? 1; }
 
     public setGif(gif: Gif): Layer {
-        return new Layer(this.id, gif, vecZero, { x: 1, y: 1 }, this.frameSampleMode, undefined);
+        return new Layer(this.id, gif, vecZero, { x: 1, y: 1 }, this.frameSampleMode, this.hidden, undefined);
     }
 
     public move(delta: Vec): Layer {
@@ -94,11 +95,15 @@ export class Layer {
     }
 
     public setPosition(pos: Vec): Layer {
-        return new Layer(this.id, this.gif, pos, this.scale, this.frameSampleMode, this.#mask);
+        return new Layer(this.id, this.gif, pos, this.scale, this.frameSampleMode, this.hidden, this.#mask);
     }
 
     public setScale(scale: Vec): Layer {
-        return new Layer(this.id, this.gif, this.position, scale, this.frameSampleMode, this.#mask);
+        return new Layer(this.id, this.gif, this.position, scale, this.frameSampleMode, this.hidden, this.#mask);
+    }
+
+    public setHidden(hidden: boolean): Layer {
+        return new Layer(this.id, this.gif, this.position, this.scale, this.frameSampleMode, hidden, this.#mask);
     }
 
     public getFrame(index: number, total: number): GifFrame | undefined {

@@ -59,6 +59,10 @@ function editorStateReducer(state: EditorState, action: actions.Actions): Editor
                         });
                 }
             }
+        case actions.ActionType.ToggleLayerVisibility:
+            {
+                return state.updateDocument(state.doc.updateLayer(action.target, layer => layer.setHidden(!layer.hidden)));
+            }
         case actions.ActionType.ChangeZoom:
             {
                 return state.updatePlayback({

@@ -35,6 +35,10 @@ export function render(
             continue;
         }
 
+        if (layer.hidden) {
+            continue;
+        }
+
         const frameToDraw = layer.getFrame(currentFrameIndex, doc.frameCount);
         if (!frameToDraw) {
             continue;
