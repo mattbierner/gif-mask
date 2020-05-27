@@ -1,5 +1,5 @@
-import { AppStage, AppState, Ready } from '../model/appState';
-import { EditorState, RenderMode } from '../model/editorState';
+import { AppStage, AppState, Ready } from '../../model/appState';
+import { EditorState, RenderMode } from '../../model/editorState';
 import * as actions from './actions';
 
 function editorStateReducer(state: EditorState, action: actions.Actions): EditorState {

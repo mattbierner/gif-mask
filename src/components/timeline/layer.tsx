@@ -8,7 +8,7 @@ import { decodeGif } from '../../load_gif';
 import { Document } from '../../model/document';
 import { RenderMode } from '../../model/editorState';
 import { Layer } from '../../model/layer';
-import * as actions from '../../views/actions';
+import * as actions from '../../views/main/actions';
 import { TimelineFrames } from './frames';
 
 

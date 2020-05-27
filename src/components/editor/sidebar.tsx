@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { DrawingTool, quickMasks, QuickMaskType, Tools } from '../../model/drawing';
 import { EditorState } from '../../model/editorState';
 import { Vec } from '../../model/vec';
-import * as actions from '../../views/actions';
+import * as actions from '../../views/main/actions';
 import { SiteLogo } from '../siteLogo';
 import * as editorActions from './actions';
 import { ExportButton } from './exportButton';

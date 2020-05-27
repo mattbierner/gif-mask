@@ -5,7 +5,7 @@ import { EditorState, RenderMode } from '../../model/editorState';
 import { Layer } from '../../model/layer';
 import { Vec, vecZero } from '../../model/vec';
 import { clamp } from '../../util/math';
-import * as actions from '../../views/actions';
+import * as actions from '../../views/main/actions';
 import * as editorActions from './actions';
 import { EditorBottomBar } from './bottomBar';
 import { render } from './render';

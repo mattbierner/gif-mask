@@ -1,6 +1,6 @@
 import { Icon } from '@material-ui/core';
 import * as React from 'react';
-import * as actions from '../../views/actions';
+import * as actions from '../../views/main/actions';
 
 export function PlaybackControls(props: {
     playing: boolean,

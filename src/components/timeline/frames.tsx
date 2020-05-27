@@ -4,7 +4,7 @@ import useResizeObserver from "use-resize-observer";
 import { Document } from '../../model/document';
 import { Layer } from '../../model/layer';
 import { getRelativeEventPosition } from '../../util/dom';
-import * as actions from '../../views/actions';
+import * as actions from '../../views/main/actions';
 
 export function TimelineFrames(props: {
     dispatch: React.Dispatch<actions.Actions>;

@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { GifEditor } from '../components/editor';
-import { SiteFooter } from '../components/siteFooter';
-import { Timeline } from '../components/timeline';
-import { loadGif } from '../load_gif';
-import { AppStage, Loading } from '../model/appState';
-import { EditorState } from '../model/editorState';
-import { Storage } from '../storage';
+import { GifEditor } from '../../components/editor';
+import { SiteFooter } from '../../components/siteFooter';
+import { Timeline } from '../../components/timeline';
+import { loadGif } from '../../load_gif';
+import { AppStage, Loading } from '../../model/appState';
+import { EditorState } from '../../model/editorState';
+import { Storage } from '../../storage';
 import * as actions from './actions';
 import { reducer } from './reducer';
 

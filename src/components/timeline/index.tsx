@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Gif } from '../../load_gif';
 import { AppStage, AppState } from '../../model/appState';
 import { Layer, LayerId } from '../../model/layer';
-import * as actions from '../../views/actions';
+import * as actions from '../../views/main/actions';
 import { PlaybackControls } from '../editor/playbackControls';
 import { LoadingSpinner } from '../loading_spinner';
 import { SearchOverlay } from '../searchOverlay';

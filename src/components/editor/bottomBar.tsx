@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { EditorState } from '../../model/editorState';
-import * as actions from '../../views/actions';
+import * as actions from '../../views/main/actions';
 
 const EditorStat = styled('span')`
     margin-right: 1em;
