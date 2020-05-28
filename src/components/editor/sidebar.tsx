@@ -39,7 +39,7 @@ export function SideBar(props: {
     );
 }
 
-const ToolGroup = styled('div')`
+const ToolGroup = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -107,7 +107,7 @@ function ToolsView(props: {
             </ToolGroup>
 
             <ToolGroup>
-                <QuickMask dispatch={props.dispatch} />
+                <QuickMaskTool dispatch={props.dispatch} />
             </ToolGroup>
 
             <ToolGroup>
@@ -152,34 +152,63 @@ function ToolsView(props: {
     );
 }
 
-function Tool(props: {
+const ToolButton = styled.button<{
     tool: DrawingTool,
+    selected?: boolean
+}>`
+    display: block;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 100px;
+    margin: 0.4em;
+    position: relative;
+    background-color: ${props => props.selected ? `var(--brand-color)` : 'var(--lightest-gray)'};
+
+    &:hover {
+        background-color: var(--brand-color);
+    }
+
+    &:active {
+        opacity: 0.8;
+    }
+
+    :after {
+        display: block;
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: ${ props => props.selected ? `var(--background-color)` : 'var(--text-color)'};
+
+        mask: ${ props => `url(${props.tool.icon})`};
+        mask-repeat: no-repeat;
+        mask-position: center;
+        mask-size: 60%;
+    }
+
+    &:hover:after {
+        background-color: var(--background-color);
+    }
+`;
+
+function Tool(props: {
+    tool: DrawingTool;
     selected?: boolean,
-    disabled?: boolean,
     onClick: () => void,
 }) {
     return (
-        <button
-            onMouseDown={props.onClick}
+        <ToolButton
+            onClick={props.onClick}
             title={`${props.tool.title} (${props.tool.key.toUpperCase()})`}
-            style={{
-                display: 'block',
-                width: '40px',
-                height: '40px',
-                border: '2px solid lightgrey',
-                borderRadius: '100px',
-                backgroundColor: props.selected ? 'var(--brand-color)' : '',
-                margin: '0.4em',
-                backgroundImage: `url(${props.tool.icon})`,
-                backgroundSize: '60%',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: '50%',
-            }}
-        />
+            tool={props.tool}
+            selected={props.selected} />
     );
 }
 
-function QuickMask(props: {
+function QuickMaskTool(props: {
     dispatch: React.Dispatch<editorActions.EditorAction>,
     disabled?: boolean
 }) {
