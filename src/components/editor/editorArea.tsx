@@ -106,7 +106,7 @@ export class EditorArea extends React.Component<{
                         const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
                         maskCtx.lineTo(x, y);
                         maskCtx.stroke();
-                        this.onDidEditActiveLayer();
+                        this.onDidEditActiveLayer(/* skipTouch */ true);
                         break;
                     }
                 case DrawingToolType.Line:
@@ -130,7 +130,7 @@ export class EditorArea extends React.Component<{
                         maskCtx.rotate(angle + Math.PI);
                         maskCtx.clearRect(0, -1000, 1000, 2000);
                         maskCtx.restore();
-                        this.onDidEditActiveLayer();
+                        this.onDidEditActiveLayer(/* skipTouch */ true);
 
                         break;
                     }
@@ -360,9 +360,9 @@ export class EditorArea extends React.Component<{
         this.onDidEditActiveLayer();
     }
 
-    private onDidEditActiveLayer() {
+    private onDidEditActiveLayer(skipTouch?: boolean) {
         const activeLayer = this.getActiveLayer();
-        if (activeLayer) {
+        if (activeLayer && !skipTouch) {
             activeLayer?.touchMask();
             this.props.didTouchLayer();
         }
