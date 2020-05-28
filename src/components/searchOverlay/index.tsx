@@ -1,6 +1,6 @@
 import Modal from '@material-ui/core/Modal';
 import * as React from 'react';
-import { Gif, loadGifFromUrl } from '../../load_gif';
+import { Gif, loadGifFromUrl } from '../../util/loadGif';
 import Search from './search';
 
 interface SearchOverlayProps {

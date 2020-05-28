@@ -2,10 +2,10 @@ import * as React from 'react';
 import { GifEditor } from '../../components/editor';
 import { SiteFooter } from '../../components/siteFooter';
 import { Timeline } from '../../components/timeline';
-import { loadGifFromUrl } from '../../load_gif';
 import { AppStage, Loading } from '../../model/appState';
 import { EditorState } from '../../model/editorState';
 import { Storage } from '../../storage';
+import { loadGifFromUrl } from '../../util/loadGif';
 import * as actions from './actions';
 import { reducer } from './reducer';
 

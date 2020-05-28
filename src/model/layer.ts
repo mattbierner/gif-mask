@@ -1,4 +1,4 @@
-import { Gif, GifFrame } from '../load_gif';
+import { Gif, GifFrame } from '../util/loadGif';
 import { Vec, vecZero } from './vec';
 
 export enum FrameSampleMode {

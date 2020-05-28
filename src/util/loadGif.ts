@@ -1,5 +1,5 @@
 import omggif = require('omggif');
-import createImageData from './util/createImageData';
+import createImageData from './createImageData';
 
 export interface GifFrame {
     readonly info: { readonly delay: number }

@@ -1,8 +1,8 @@
-import { Gif } from '../../load_gif';
 import { Document } from '../../model/document';
 import { DrawingSettings } from '../../model/drawing';
 import { EditorState } from '../../model/editorState';
 import { LayerId, LayerIndex } from '../../model/layer';
+import { Gif } from '../../util/loadGif';
 
 export enum ActionType {
     Loaded,

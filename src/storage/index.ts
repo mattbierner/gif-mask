@@ -1,8 +1,8 @@
 import * as localforage from 'localforage';
-import { Gif, GifFrame } from '../load_gif';
 import { Document } from '../model/document';
 import { EditorState } from '../model/editorState';
 import { Layer, LayerId } from '../model/layer';
+import { Gif, GifFrame } from '../util/loadGif';
 
 const debug = true;
 

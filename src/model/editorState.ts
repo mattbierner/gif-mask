@@ -1,4 +1,4 @@
-import { GifFrame } from '../load_gif';
+import { GifFrame } from '../util/loadGif';
 import { Document } from './document';
 import { DrawingSettings, DrawingToolType } from './drawing';
 import { Layer, LayerId } from './layer';

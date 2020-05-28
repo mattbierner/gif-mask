@@ -4,10 +4,10 @@ import * as React from 'react';
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';
 import { useDropzone } from 'react-dropzone';
 import styled from 'styled-components';
-import { loadGifFromFile } from '../../load_gif';
 import { Document } from '../../model/document';
 import { RenderMode } from '../../model/editorState';
 import { Layer } from '../../model/layer';
+import { loadGifFromFile } from '../../util/loadGif';
 import * as actions from '../../views/main/actions';
 import { TimelineFrames } from './frames';
 

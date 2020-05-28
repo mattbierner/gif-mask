@@ -1,4 +1,4 @@
-import { Gif, GifFrame } from '../load_gif';
+import { Gif, GifFrame } from '../util/loadGif';
 import { Layer, LayerId } from './layer';
 import { Vec } from './vec';
 
