@@ -43,6 +43,11 @@ export class EditorArea extends React.Component<{
                 return;
             }
 
+            if (!e.buttons) {
+                isDrawing = false;
+                return;
+            }
+
             const editorState = this.props.state.editorState;
             const zoom = this.props.state.editorState.playback.zoom;
 
