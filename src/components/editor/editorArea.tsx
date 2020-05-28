@@ -218,6 +218,7 @@ export class EditorArea extends React.Component<{
 
         return (
             <div style={{
+                gridArea: 'editor',
                 display: 'flex',
                 flex: 1,
                 overflow: 'scroll',

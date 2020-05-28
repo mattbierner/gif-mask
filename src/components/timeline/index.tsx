@@ -81,6 +81,7 @@ export function Timeline(props: {
 
     return (
         <div style={{
+            gridArea: 'timeline',
             borderTop: '1px solid lightgray',
             maxHeight: '50vh',
             minHeight: '100px',

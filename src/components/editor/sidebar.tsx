@@ -17,6 +17,7 @@ export function SideBar(props: {
 }) {
     return (
         <div style={{
+            gridArea: 'side-bar',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',

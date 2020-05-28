@@ -70,8 +70,14 @@ export function CreateView(): React.ReactElement {
         <div style={{
             height: '100vh',
             width: '100%',
-            display: 'grid',
             gridTemplateRows: '1fr auto auto',
+            display: 'grid',
+            gridTemplate: `
+                'side-bar editor' 1fr
+                'timeline timeline'
+                'footer footer'
+                / 120px 1fr
+            `,
         }}>
             <GifEditor
                 dispatch={dispatch}

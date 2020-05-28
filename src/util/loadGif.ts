@@ -87,22 +87,16 @@ export const loadGifFromUrl = (url: string): Promise<Gif> =>
 export const loadGifFromFile = (file: File): Promise<Gif> => {
     const fileReader = new FileReader();
 
-    let resolve: (gif: Gif) => void;
-    let reject: (e: Error) => void;
-    const p = new Promise<Gif>((res, rej) => {
-        resolve = res;
-        reject = rej;
+    return new Promise<Gif>((resolve, reject) => {
+        fileReader.onload = (event) => {
+            resolve(decodeGif(new Uint8Array((event.target as any).result as ArrayBuffer)));
+        };
+
+        fileReader.onerror = (e) => {
+            console.error(e);
+            reject(new Error('Could not read gif'));
+        };
+
+        fileReader.readAsArrayBuffer(file);
     });
-
-    fileReader.onload = (event) => {
-        resolve(decodeGif(new Uint8Array((event.target as any).result as ArrayBuffer)));
-    };
-
-    fileReader.onerror = (e) => {
-        console.error(e);
-        reject(new Error('Could not ready gif'));
-    };
-
-    fileReader.readAsArrayBuffer(file);
-    return p;
 };

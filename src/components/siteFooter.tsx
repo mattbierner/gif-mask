@@ -15,6 +15,7 @@ const Link = styled('a')`
 export function SiteFooter() {
     return (
         <footer className='site-footer' style={{
+            gridArea: 'footer',
             fontFamily: 'var(--monospace-font-family)',
             color: 'var(--background-color)',
             fontSize: '0.9em',

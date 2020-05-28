@@ -109,12 +109,7 @@ export function GifEditor(props: {
         : EditorState.empty;
 
     return (
-        <div style={{
-            maxWidth: '100%',
-            flex: 1,
-            display: 'grid',
-            gridTemplateColumns: '120px 1fr',
-        }}>
+        <>
             <SideBar
                 dispatch={props.dispatch}
                 dispatchEditor={dispatchEditor}
@@ -135,7 +130,7 @@ export function GifEditor(props: {
                     dispatch={props.dispatch}
                     editorState={editorState} />
             </div>
-        </div>
+        </>
     );
 }
 
