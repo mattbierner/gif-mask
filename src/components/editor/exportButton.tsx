@@ -11,13 +11,15 @@ export function ExportButton(props: {
         exporting: false
     });
 
-    const exportGif = React.useCallback(() => {
+    const exportGif = async () => {
         setState({ exporting: true });
         props.beginExport();
         const { width, height } = props.editorState.doc;
+
+        const { GifEncoder } = await import(`../../gifencoder`);
         const encoder = new GifEncoder({ width, height });
 
-        encoder.once('finished', blob => {
+        encoder.once('finished', (blob: Blob) => {
             encoder.dispose();
             const url = URL.createObjectURL(blob);
             window.open(url);
@@ -40,11 +42,7 @@ export function ExportButton(props: {
         }
 
         encoder.render();
-    }, [
-        props.editorState,
-        props.beginExport,
-        props.endExport,
-    ]);
+    };
 
     return (
         <button onMouseDown={exportGif} disabled={state.exporting}>Export</button>

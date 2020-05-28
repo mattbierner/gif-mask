@@ -1,3 +1,5 @@
+// From encoder/gifencoder
+
 // IDEA: could we speed this up with WASM?
 function computeDiff(a, b, width) {
   const ua = new Uint32Array(a);
@@ -41,7 +43,7 @@ function cropBuffer(_from, box, width) {
   return result;
 }
 
-class GifEncoder {
+export class GifEncoder {
 
   constructor(opts) {
     this.opts = opts;
