@@ -76,7 +76,33 @@ const extractGifFrameData = (reader: GifReader): GifFrame[] => {
 };
 
 /**
- * Load and decode a gif.
+ * Load and decode a gif from a url
  */
-export const loadGif = (url: string): Promise<Gif> =>
+export const loadGifFromUrl = (url: string): Promise<Gif> =>
     loadBinaryData(url).then(decodeGif);
+
+/**
+ * Load and decode a gif from a file.
+ */
+export const loadGifFromFile = (file: File): Promise<Gif> => {
+    const fileReader = new FileReader();
+
+    let resolve: (gif: Gif) => void;
+    let reject: (e: Error) => void;
+    const p = new Promise<Gif>((res, rej) => {
+        resolve = res;
+        reject = rej;
+    });
+
+    fileReader.onload = (event) => {
+        resolve(decodeGif(new Uint8Array((event.target as any).result as ArrayBuffer)));
+    };
+
+    fileReader.onerror = (e) => {
+        console.error(e);
+        reject(new Error('Could not ready gif'));
+    };
+
+    fileReader.readAsArrayBuffer(file);
+    return p;
+};

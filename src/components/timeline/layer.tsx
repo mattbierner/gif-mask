@@ -4,7 +4,7 @@ import * as React from 'react';
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd';
 import { useDropzone } from 'react-dropzone';
 import styled from 'styled-components';
-import { decodeGif } from '../../load_gif';
+import { loadGifFromFile } from '../../load_gif';
 import { Document } from '../../model/document';
 import { RenderMode } from '../../model/editorState';
 import { Layer } from '../../model/layer';
@@ -106,24 +106,15 @@ export function LayerView(props: {
         drag(drop(ref));
     }
 
-    const onDrop = React.useCallback((acceptedFiles: readonly File[]) => {
+    const onDrop = async (acceptedFiles: readonly File[]) => {
         if (!acceptedFiles.length) {
             return;
         }
 
         const file = acceptedFiles[0];
-        const fileReader = new FileReader();
-        fileReader.onload = (event) => {
-            const gif = decodeGif(new Uint8Array((event.target as any).result as ArrayBuffer));
-            props.dispatch(new actions.SetLayerGif(props.layer.id, gif));
-        };
-
-        fileReader.onerror = (e) => {
-            console.error(e);
-        };
-
-        fileReader.readAsArrayBuffer(file);
-    }, []);
+        const gif = await loadGifFromFile(file);
+        props.dispatch(new actions.SetLayerGif(props.layer.id, gif));
+    };
 
     const { getRootProps } = useDropzone({ onDrop, accept: 'image/gif' });
 

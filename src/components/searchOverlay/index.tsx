@@ -1,6 +1,6 @@
 import Modal from '@material-ui/core/Modal';
 import * as React from 'react';
-import { Gif, loadGif } from '../../load_gif';
+import { Gif, loadGifFromUrl } from '../../load_gif';
 import Search from './search';
 
 interface SearchOverlayProps {
@@ -50,7 +50,7 @@ export class SearchOverlay extends React.Component<SearchOverlayProps, SearchOve
             error: undefined
         });
 
-        loadGif(src)
+        loadGifFromUrl(src)
             .then(gif => {
                 this.setState({
                     loadingGif: false

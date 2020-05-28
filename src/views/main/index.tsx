@@ -2,7 +2,7 @@ import * as React from 'react';
 import { GifEditor } from '../../components/editor';
 import { SiteFooter } from '../../components/siteFooter';
 import { Timeline } from '../../components/timeline';
-import { loadGif } from '../../load_gif';
+import { loadGifFromUrl } from '../../load_gif';
 import { AppStage, Loading } from '../../model/appState';
 import { EditorState } from '../../model/editorState';
 import { Storage } from '../../storage';
@@ -56,8 +56,8 @@ export function CreateView(): React.ReactElement {
                 dispatch(new actions.Loaded(EditorState.empty));
 
                 const [rainbow, cage] = await Promise.all([
-                    loadGif('images/example/rainbow.gif'),
-                    loadGif('images/example/cage.gif'),
+                    loadGifFromUrl('images/example/rainbow.gif'),
+                    loadGifFromUrl('images/example/cage.gif'),
                 ]);
                 dispatch(new actions.AddLayer(rainbow));
                 dispatch(new actions.AddLayer(cage));
