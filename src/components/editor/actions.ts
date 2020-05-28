@@ -5,6 +5,7 @@ import { Vec } from '../../model/vec';
 export enum EditorActionType {
     SetDrawTool,
     IncrementStroke,
+    SetStroke,
 
     QuickMask,
 
@@ -36,6 +37,14 @@ export class IncrementStroke {
     ) { }
 }
 
+export class SetStroke {
+    public readonly type = EditorActionType.SetStroke;
+
+    constructor(
+        public readonly stroke: number
+    ) { }
+}
+
 export class SetLayerPosition {
     public readonly type = EditorActionType.SetLayerPosition;
 
@@ -57,6 +66,7 @@ export class SetLayerScale {
 export type EditorAction =
     | SetDrawTool
     | IncrementStroke
+    | SetStroke
     | QuickMask
     | SetLayerPosition
     | SetLayerScale

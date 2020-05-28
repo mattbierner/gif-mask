@@ -90,10 +90,12 @@ function ToolsView(props: {
                     {createTool(Tools.Brush)}
                     {createTool(Tools.Erase)}
                 </div>
-                <div style={{
-                    fontFamily: 'var(--monospace-font-family)',
-                    fontSize: '12px',
-                }}>stoke={props.editorState.drawSettings.strokeSize}px</div>
+                <LabeledNumberInput
+                    label="stroke"
+                    value={props.editorState.drawSettings.strokeSize}
+                    min={1}
+                    max={500}
+                    onChange={value => props.dispatch(new editorActions.SetStroke(value))} />
             </ToolGroup>
 
             <ToolGroup>
@@ -111,42 +113,36 @@ function ToolsView(props: {
             </ToolGroup>
 
             <ToolGroup>
-                <div>
-                    x=<input style={{ maxWidth: '40px' }}
-                        type='text'
-                        pattern="[0-9\.\-]*"
-                        min={-1000}
-                        max={1000}
-                        disabled={!isMoveableLayerSelected}
-                        value={props.editorState.activeLayer?.position.x ?? 0}
-                        onChange={e => updatePosition({
-                            x: +e.target.value,
-                            y: props.editorState.activeLayer?.position.y ?? 0,
-                        })} />
-                </div>
-                <div>
-                    y=<input style={{ maxWidth: '40px' }}
-                        type='text'
-                        pattern="[0-9\.\-]*"
-                        min={-1000}
-                        max={1000}
-                        disabled={!isMoveableLayerSelected}
-                        value={props.editorState.activeLayer?.position.y ?? 0}
-                        onChange={e => updatePosition({
-                            x: props.editorState.activeLayer?.position.x ?? 0,
-                            y: +e.target.value,
-                        })} />
-                </div>
-                <div>
-                    scale=<input style={{ maxWidth: '40px' }}
-                        type='text'
-                        pattern="[0-9]*"
-                        min={1}
-                        max={1000}
-                        disabled={!isMoveableLayerSelected}
-                        value={(props.editorState.activeLayer?.scale.x ?? 1) * 100}
-                        onChange={e => updateScale(+e.target.value / 100)} />
-                </div>
+                <LabeledNumberInput
+                    label="x"
+                    value={props.editorState.activeLayer?.position.x ?? 0}
+                    min={-1000}
+                    max={1000}
+                    disabled={!isMoveableLayerSelected}
+                    onChange={x => updatePosition({
+                        x,
+                        y: props.editorState.activeLayer?.position.y ?? 0,
+                    })} />
+
+                <LabeledNumberInput
+                    label="y"
+                    value={props.editorState.activeLayer?.position.y ?? 0}
+                    min={-1000}
+                    max={1000}
+                    disabled={!isMoveableLayerSelected}
+                    onChange={y => updatePosition({
+                        x: props.editorState.activeLayer?.position.x ?? 0,
+                        y,
+                    })} />
+            </ToolGroup>
+            <ToolGroup>
+                <LabeledNumberInput
+                    label="scale"
+                    value={(props.editorState.activeLayer?.scale.x ?? 1) * 100}
+                    min={1}
+                    max={1000}
+                    disabled={!isMoveableLayerSelected}
+                    onChange={value => updateScale(value / 100)} />
             </ToolGroup>
         </div>
     );
@@ -232,5 +228,31 @@ function QuickMaskTool(props: {
             <option disabled>-----</option>
             {options}
         </select>
+    );
+}
+
+function LabeledNumberInput(props: {
+    label: string,
+    value: number,
+    min: number,
+    max: number,
+    disabled?: boolean,
+    onChange: (value: number) => void,
+}) {
+    return (
+        <div>
+            <label htmlFor={props.label}>{props.label}</label>=<input id={props.label}
+                type='text'
+                pattern={props.min < 0 ? '[0-9\\.\\-]*' : '[0-9\\.]*'}
+                min={props.min}
+                max={props.max}
+                disabled={props.disabled}
+                value={props.value}
+                onChange={e => props.onChange(+e.target.value)}
+                style={{
+                    maxWidth: '40px',
+                    textAlign: 'center',
+                }} />
+        </div>
     );
 }

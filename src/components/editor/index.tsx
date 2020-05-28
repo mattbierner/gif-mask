@@ -19,7 +19,7 @@ export function GifEditor(props: {
 }) {
     const editorRef = React.useRef<EditorArea>();
 
-    const dispatchEditor = React.useCallback((action: editorActions.EditorAction) => {
+    const dispatchEditor = React.useCallback((action: editorActions.EditorAction): void => {
         if (props.state.type !== AppStage.Ready) {
             return;
         }
@@ -34,9 +34,13 @@ export function GifEditor(props: {
                 }
             case editorActions.EditorActionType.IncrementStroke:
                 {
+                    return dispatchEditor(new editorActions.SetStroke(props.state.editorState.drawSettings.strokeSize + action.by));
+                }
+            case editorActions.EditorActionType.SetStroke:
+                {
                     return props.dispatch(new actions.UpdateDrawing({
                         ...props.state.editorState.drawSettings,
-                        strokeSize: clamp(props.state.editorState.drawSettings.strokeSize + action.by, 1, 200)
+                        strokeSize: clamp(action.stroke, 1, 500)
                     }));
                 }
             case editorActions.EditorActionType.QuickMask:
