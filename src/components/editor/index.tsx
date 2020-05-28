@@ -128,7 +128,7 @@ export function GifEditor(props: {
             }}>
                 <EditorArea ref={editorRef as React.Ref<EditorArea>}
                     dispatch={props.dispatch}
-                    state={props.state}
+                    editorState={editorState}
                     didTouchLayer={props.didTouchLayer} />
 
                 <EditorBottomBar
