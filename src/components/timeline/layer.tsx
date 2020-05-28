@@ -116,7 +116,7 @@ export function LayerView(props: {
         props.dispatch(new actions.SetLayerGif(props.layer.id, gif));
     };
 
-    const { getRootProps } = useDropzone({ onDrop, accept: 'image/gif' });
+    const { getRootProps, isDragAccept } = useDropzone({ onDrop, accept: 'image/gif' });
 
     const maxHeight800 = useMediaQuery('(max-height:800px)');
 
@@ -131,6 +131,7 @@ export function LayerView(props: {
                 backgroundColor: props.active ? 'lightgrey' : '',
                 borderTop: '1px solid black',
                 height: maxHeight800 ? '40px' : '60px',
+                position: 'relative',
             }}>
             <LayerHeader onClick={() => props.dispatch(new actions.SelectLayer(props.layer.id))}>
                 <div ref={isBaseLayer ? undefined : ref}
@@ -174,6 +175,15 @@ export function LayerView(props: {
                 model={props.model}
                 layer={props.layer}
                 currentFrame={props.currentFrame} />
+
+            {isDragAccept && <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: '#4447',
+            }} />}
         </div>
     );
 }
