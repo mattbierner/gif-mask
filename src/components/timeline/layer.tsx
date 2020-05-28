@@ -12,27 +12,7 @@ import * as actions from '../../views/main/actions';
 import { TimelineFrames } from './frames';
 
 
-const TimelineControl = styled('button')`
-    margin: 0 6px;
-    padding: 4px;
-    vertical-align: middle;
-    text-align: center;
-
-    border: none;
-    border-radius: 100px;
-    background: none;
-    
-    & .material-icons {
-        font-size: 1.6em;
-    }
-
-    &:hover:not(:disabled),
-    &.active {
-        background-color: var(--brand-color);
-    }
-`;
-
-const LayerHeader = styled('div')`
+const LayerHeader = styled.div`
     padding: 0.4em 1em;
     padding-left: 0.2em;
     border-right: 1px solid black;
@@ -48,7 +28,7 @@ const LayerHeader = styled('div')`
     }
 `;
 
-const LayerLabel = styled('span')`
+const LayerLabel = styled.span`
     padding-right: 0.4em;
     font-family: var(--monospace-font-family);
     white-space: pre;
@@ -126,7 +106,6 @@ export function LayerView(props: {
         drag(drop(ref));
     }
 
-
     const onDrop = React.useCallback((acceptedFiles: readonly File[]) => {
         if (!acceptedFiles.length) {
             return;
@@ -176,36 +155,27 @@ export function LayerView(props: {
 
                 <LayerLabel>Layer {props.layer.id.value.toString().padEnd(3, ' ')}</LayerLabel>
 
-                <TimelineControl title="Load Gif" onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    props.onSelectGif(props.layer);
-                }}>
-                    <Icon>search</Icon>
-                </TimelineControl>
+                <TimelineControl
+                    title="Load Gif"
+                    icon='search'
+                    onClick={() => props.onSelectGif(props.layer)} />
 
-                <TimelineControl title="Visible"
-                    onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        props.dispatch(new actions.ToggleLayerVisibility(props.layer.id));
-                    }}>
-                    <Icon>{props.layer.hidden ? 'visibility_off' : 'visibility'}</Icon>
-                </TimelineControl>
+                <TimelineControl
+                    title="Visible"
+                    icon={props.layer.hidden ? 'visibility_off' : 'visibility'}
+                    onClick={() => props.dispatch(new actions.ToggleLayerVisibility(props.layer.id))} />
 
-                <TimelineControl title="Show mask"
-                    className={props.active && props.renderMode === RenderMode.ActiveMask ? 'active' : ''}
-                    onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        props.dispatch(new actions.ToggleMaskRendering(props.layer.id));
-                    }}>
-                    <Icon>adjust</Icon>
-                </TimelineControl>
+                <TimelineControl
+                    title="Show mask"
+                    icon='adjust'
+                    active={props.active && props.renderMode === RenderMode.ActiveMask}
+                    onClick={() => props.dispatch(new actions.ToggleMaskRendering(props.layer.id))} />
 
-                <TimelineControl title="Delete layer" disabled={props.model.baseLayer?.id.equals(props.layer.id)} onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    props.dispatch(new actions.DeleteLayer(props.layer.id));
-                }}>
-                    <Icon>close</Icon>
-                </TimelineControl>
+                <TimelineControl
+                    title="Delete layer"
+                    icon='close'
+                    disabled={isBaseLayer}
+                    onClick={() => props.dispatch(new actions.DeleteLayer(props.layer.id))} />
             </LayerHeader>
 
             <TimelineFrames
@@ -214,5 +184,58 @@ export function LayerView(props: {
                 layer={props.layer}
                 currentFrame={props.currentFrame} />
         </div>
+    );
+}
+
+const TimelineButton = styled.button<{
+    active?: boolean
+}>`
+    margin: 0 6px;
+    padding: 4px;
+    vertical-align: middle;
+    text-align: center;
+
+    border: none;
+    border-radius: 100px;
+    background: none;
+    background-color: ${props => props.active ? 'var(--brand-color)' : ''};
+    color: ${props => props.active ? 'var(--background-color)' : 'var(--text-color)'};
+
+    &:active {
+        opacity: 0.8;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+    }
+
+    &.material-icons {
+        font-size: 1.6em;
+    }
+
+    &:hover:not(:disabled) {
+        background-color: var(--brand-color);
+        color: var(--background-color);
+    }
+`;
+
+function TimelineControl(props: {
+    title: string,
+    icon: string,
+    onClick: () => void,
+    active?: boolean,
+    disabled?: boolean,
+}) {
+    return (
+        <TimelineButton
+            title={props.title}
+            disabled={props.disabled}
+            active={props.active}
+            onClick={e => {
+                e.stopPropagation();
+                props.onClick();
+            }}>
+            <Icon>{props.icon}</Icon>
+        </TimelineButton>
     );
 }
