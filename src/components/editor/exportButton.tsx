@@ -25,7 +25,7 @@ export function ExportButton(props: {
             window.open(url);
             props.endExport();
             setState({ exporting: false });
-            URL.revokeObjectURL(url);
+            // URL.revokeObjectURL(url); // TODO: maybe do this after a delay?
         });
 
         const canvas = document.createElement('canvas');
