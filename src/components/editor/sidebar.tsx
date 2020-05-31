@@ -139,7 +139,7 @@ function ToolsView(props: {
             <ToolGroup>
                 <LabeledNumberInput
                     label="scale"
-                    value={(props.editorState.activeLayer?.scale.x ?? 1) * 100}
+                    value={Math.ceil((props.editorState.activeLayer?.scale.x ?? 1) * 100)}
                     min={1}
                     max={1000}
                     disabled={!isMoveableLayerSelected}
