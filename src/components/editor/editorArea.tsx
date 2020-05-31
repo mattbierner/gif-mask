@@ -7,6 +7,15 @@ import * as actions from '../../views/main/actions';
 import { render } from './render';
 import ReactDOM = require('react-dom');
 
+/**
+ * State of the currently drawing tool
+ */
+interface ActiveToolState {
+    readonly tool: DrawingToolType;
+    readonly mouseDownPosition: Vec;
+    readonly layerMovingShift: Vec;
+}
+
 export class EditorArea extends React.Component<{
     dispatch: React.Dispatch<actions.Actions>,
     editorState: EditorState,
@@ -18,8 +27,7 @@ export class EditorArea extends React.Component<{
     private _workingCanvas?: HTMLCanvasElement;
     private _workingCtx?: CanvasRenderingContext2D;
 
-    private _layerMovingShift = vecZero;
-    private _activeTool: DrawingToolType | undefined;
+    private _activeTool?: ActiveToolState;
 
     componentDidMount() {
         const canvasArea = ReactDOM.findDOMNode(this) as HTMLElement;
@@ -29,27 +37,21 @@ export class EditorArea extends React.Component<{
         this._workingCanvas = document.createElement('canvas');
         this._workingCtx = this._workingCanvas.getContext('2d')!;
 
-        let isDrawing = false;
-        let mouseDownPosition = vecZero;
-
         canvasArea.onmousedown = (e) => {
             const activeLayer = this.getActiveLayer();
             if (!activeLayer) {
                 return;
             }
 
-            if (!e.buttons) {
-                isDrawing = false;
-                return;
-            }
-
             const editorState = this.props.editorState;
             const zoom = this.props.editorState.playback.zoom;
 
-            isDrawing = true;
-            mouseDownPosition = this.getPositionInCanvas(e);
-            this._layerMovingShift = vecZero;
-            this._activeTool = editorState.drawSettings.tool;
+            const mouseDownPosition = this.getPositionInCanvas(e);
+            this._activeTool = {
+                tool: editorState.drawSettings.tool,
+                mouseDownPosition: mouseDownPosition,
+                layerMovingShift: vecZero,
+            };
 
             const relativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, zoom);
 
@@ -75,7 +77,7 @@ export class EditorArea extends React.Component<{
         };
 
         canvasArea.onmousemove = (e) => {
-            if (!isDrawing) {
+            if (!this._activeTool) {
                 return;
             }
 
@@ -90,7 +92,7 @@ export class EditorArea extends React.Component<{
             }
             const zoom = this.props.editorState.playback.zoom;
 
-            switch (this._activeTool) {
+            switch (this._activeTool.tool) {
                 case DrawingToolType.Brush:
                 case DrawingToolType.Erase:
                     {
@@ -102,7 +104,7 @@ export class EditorArea extends React.Component<{
                     }
                 case DrawingToolType.Line:
                     {
-                        const mouseDownRelativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, zoom);
+                        const mouseDownRelativePosition = this.getPositionInLayer(this._activeTool.mouseDownPosition, activeLayer, zoom);
                         const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
                         const dx = mouseDownRelativePosition.x - x;
                         const dy = mouseDownRelativePosition.y - y;
@@ -129,11 +131,14 @@ export class EditorArea extends React.Component<{
                     {
                         if (activeLayer !== this.props.editorState.doc.baseLayer) {
                             const { x, y } = this.getPositionInCanvas(e);
-                            const dx = x - mouseDownPosition.x;
-                            const dy = y - mouseDownPosition.y;
-                            this._layerMovingShift = {
-                                x: Math.round(dx / zoom),
-                                y: Math.round(dy / zoom),
+                            const dx = x - this._activeTool.mouseDownPosition.x;
+                            const dy = y - this._activeTool.mouseDownPosition.y;
+                            this._activeTool = {
+                                ...this._activeTool,
+                                layerMovingShift: {
+                                    x: Math.round(dx / zoom),
+                                    y: Math.round(dy / zoom),
+                                }
                             };
                             this.requestCanvasRender();
                         }
@@ -143,12 +148,11 @@ export class EditorArea extends React.Component<{
         };
 
         document.body.addEventListener('mouseup', e => {
-            if (!isDrawing) {
+            if (!this._activeTool) {
                 return;
             }
 
-            isDrawing = false;
-            this._layerMovingShift = vecZero;
+            const mouseDownPosition = this._activeTool.mouseDownPosition;
             this._activeTool = undefined;
 
             const activeLayer = this.getActiveLayer();
@@ -247,6 +251,7 @@ export class EditorArea extends React.Component<{
 
         const activeLayer = this.getActiveLayer();
         const zoom = this.props.editorState.playback.zoom;
+        const shift = this._activeTool?.layerMovingShift ?? vecZero;
 
         this._ctx.clearRect(0, 0, 10000, 10000);
 
@@ -254,8 +259,8 @@ export class EditorArea extends React.Component<{
             if (activeLayer && activeLayer.gif) {
                 this._ctx.save();
                 {
-                    const x = (activeLayer.position.x + this._layerMovingShift.x) * zoom;
-                    const y = (activeLayer.position.y + this._layerMovingShift.y) * zoom;
+                    const x = (activeLayer.position.x + shift.x) * zoom;
+                    const y = (activeLayer.position.y + shift.y) * zoom;
                     const layerWidth = activeLayer.gif.width * activeLayer.scale.x * zoom;
                     const layerHeight = activeLayer.gif.height * activeLayer.scale.y * zoom;
 
@@ -273,7 +278,7 @@ export class EditorArea extends React.Component<{
         } else {
             let docToRender = this.props.editorState.doc;
             if (activeLayer && activeLayer !== docToRender.baseLayer) {
-                docToRender = docToRender.moveLayer(activeLayer.id, this._layerMovingShift);
+                docToRender = docToRender.moveLayer(activeLayer.id, shift);
             }
 
             render(
@@ -282,7 +287,7 @@ export class EditorArea extends React.Component<{
                 zoom,
                 this._ctx,
                 {
-                    showBordersFor: activeLayer && this._activeTool === DrawingToolType.Move ? [activeLayer.id] : []
+                    showBordersFor: activeLayer && this._activeTool?.tool === DrawingToolType.Move ? [activeLayer.id] : []
                 });
         }
     }
