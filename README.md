@@ -63,6 +63,19 @@ All data is stored client side. There are no server components.
 
 The app saves the state of the document so you can close the window and return to perfect your gif later. However at the moment the app only supports working with a single gif at a time.
 
+## Building
+
+The site is mainly written in TypeScript using react. It is bundled using webpack and served using [Jekyll](https://jekyllrb.com)
+
+To run the site:
+
+```bash
+$ npm install
+$ npm run build
+$ Jekyll serve 
+```
+
+The main scripts are under `src/`. The bundled JavaScript is output to `js/`
 
 ## Credits
 
