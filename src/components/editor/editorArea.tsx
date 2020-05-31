@@ -7,6 +7,11 @@ import * as actions from '../../views/main/actions';
 import { render } from './render';
 import ReactDOM = require('react-dom');
 
+interface EventWithPosition {
+    readonly clientX: number;
+    readonly clientY: number;
+}
+
 /**
  * State of the currently drawing tool
  */
@@ -16,6 +21,7 @@ interface ActiveToolState {
     readonly layerMovingShift: Vec;
 }
 
+
 export class EditorArea extends React.Component<{
     dispatch: React.Dispatch<actions.Actions>,
     editorState: EditorState,
@@ -24,194 +30,35 @@ export class EditorArea extends React.Component<{
     private _canvas?: HTMLCanvasElement;
     private _ctx?: CanvasRenderingContext2D;
 
-    private _workingCanvas?: HTMLCanvasElement;
-    private _workingCtx?: CanvasRenderingContext2D;
+    // Scratch canvas and context used for drawing operations
+    private _scratchCanvas?: HTMLCanvasElement;
+    private _scratchCtx?: CanvasRenderingContext2D;
 
     private _activeTool?: ActiveToolState;
 
     componentDidMount() {
-        const canvasArea = ReactDOM.findDOMNode(this) as HTMLElement;
-        this._canvas = (canvasArea).getElementsByTagName('canvas')[0];
+        const element = ReactDOM.findDOMNode(this) as HTMLElement;
+        this._canvas = element.getElementsByTagName('canvas')[0];
         this._ctx = this._canvas.getContext('2d') || undefined;
 
-        this._workingCanvas = document.createElement('canvas');
-        this._workingCtx = this._workingCanvas.getContext('2d')!;
+        this._scratchCanvas = document.createElement('canvas');
+        this._scratchCtx = this._scratchCanvas.getContext('2d')!;
 
-        canvasArea.onmousedown = (e) => {
-            const activeLayer = this.getActiveLayer();
-            if (!activeLayer) {
-                return;
-            }
+        element.addEventListener('touchstart', this.onTouchStart, { passive: false });
+        element.addEventListener('touchmove', this.onTouchMove, { passive: false });
 
-            const editorState = this.props.editorState;
-            const zoom = this.props.editorState.playback.zoom;
+        document.body.addEventListener('mouseup', this.onMouseUp);
+        document.body.addEventListener('touchend', this.onTouchEnd);
+    }
 
-            const mouseDownPosition = this.getPositionInCanvas(e);
-            this._activeTool = {
-                tool: editorState.drawSettings.tool,
-                mouseDownPosition: mouseDownPosition,
-                layerMovingShift: vecZero,
-            };
+    componentWillUnmount() {
+        const element = ReactDOM.findDOMNode(this) as HTMLElement;
 
-            const relativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, zoom);
+        element.addEventListener('touchstart', this.onTouchStart);
+        element.addEventListener('touchmove', this.onTouchMove);
 
-            const maskCtx = this.getActiveLayerMaskCtx()!;
-            maskCtx.fillStyle = 'black';
-            maskCtx.strokeStyle = 'black';
-            maskCtx.lineJoin = maskCtx!.lineCap = 'round';
-            maskCtx.lineWidth = editorState.drawSettings.strokeSize / activeLayer.scale.x;
-            maskCtx.globalCompositeOperation = editorState.drawSettings.tool === DrawingToolType.Erase
-                ? 'destination-out'
-                : 'source-over';
-
-            switch (editorState.drawSettings.tool) {
-                case DrawingToolType.Brush:
-                case DrawingToolType.Erase:
-                    maskCtx.beginPath();
-                    maskCtx.moveTo(relativePosition.x, relativePosition.y);
-                    maskCtx.lineTo(relativePosition.x, relativePosition.y);
-                    maskCtx.stroke();
-                    this.onDidEditActiveLayer();
-                    break;
-            }
-        };
-
-        canvasArea.onmousemove = (e) => {
-            if (!this._activeTool) {
-                return;
-            }
-
-            const activeLayer = this.getActiveLayer();
-            if (!activeLayer) {
-                return;
-            }
-
-            const maskCtx = this.getActiveLayerMaskCtx();
-            if (!maskCtx) {
-                return;
-            }
-            const zoom = this.props.editorState.playback.zoom;
-
-            switch (this._activeTool.tool) {
-                case DrawingToolType.Brush:
-                case DrawingToolType.Erase:
-                    {
-                        const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
-                        maskCtx.lineTo(x, y);
-                        maskCtx.stroke();
-                        this.onDidEditActiveLayer(/* skipTouch */ true);
-                        break;
-                    }
-                case DrawingToolType.Line:
-                    {
-                        const mouseDownRelativePosition = this.getPositionInLayer(this._activeTool.mouseDownPosition, activeLayer, zoom);
-                        const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
-                        const dx = mouseDownRelativePosition.x - x;
-                        const dy = mouseDownRelativePosition.y - y;
-                        const angle = Math.atan2(dy, dx);
-
-                        maskCtx.clearRect(0, 0, 10000, 10000);
-
-                        maskCtx.save();
-                        maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
-                        maskCtx.rotate(angle);
-                        maskCtx.fillRect(0, -1000, 1000, 2000);
-                        maskCtx.restore();
-
-                        maskCtx.save();
-                        maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
-                        maskCtx.rotate(angle + Math.PI);
-                        maskCtx.clearRect(0, -1000, 1000, 2000);
-                        maskCtx.restore();
-                        this.onDidEditActiveLayer(/* skipTouch */ true);
-
-                        break;
-                    }
-                case DrawingToolType.Move:
-                    {
-                        if (activeLayer !== this.props.editorState.doc.baseLayer) {
-                            const { x, y } = this.getPositionInCanvas(e);
-                            const dx = x - this._activeTool.mouseDownPosition.x;
-                            const dy = y - this._activeTool.mouseDownPosition.y;
-                            this._activeTool = {
-                                ...this._activeTool,
-                                layerMovingShift: {
-                                    x: Math.round(dx / zoom),
-                                    y: Math.round(dy / zoom),
-                                }
-                            };
-                            this.requestCanvasRender();
-                        }
-                        break;
-                    }
-            }
-        };
-
-        document.body.addEventListener('mouseup', e => {
-            if (!this._activeTool) {
-                return;
-            }
-
-            const mouseDownPosition = this._activeTool.mouseDownPosition;
-            this._activeTool = undefined;
-
-            const activeLayer = this.getActiveLayer();
-            if (!activeLayer) {
-                return;
-            }
-
-            const zoom = this.props.editorState.playback.zoom;
-            const mouseDownRelativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, zoom);
-            const maskCtx = this.getActiveLayerMaskCtx()!;
-
-            switch (this.props.editorState.drawSettings.tool) {
-                case DrawingToolType.Brush:
-                case DrawingToolType.Erase:
-                    {
-                        maskCtx.closePath();
-                        break;
-                    }
-                case DrawingToolType.Line:
-                    {
-                        const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
-                        const dx = mouseDownRelativePosition.x - x;
-                        const dy = mouseDownRelativePosition.y - y;
-                        const angle = Math.atan2(dy, dx);
-
-                        maskCtx.clearRect(0, 0, 10000, 10000);
-
-                        maskCtx.save();
-                        maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
-                        maskCtx.rotate(angle);
-                        maskCtx.fillRect(0, -1000, 1000, 2000);
-                        maskCtx.restore();
-
-                        maskCtx.save();
-                        maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
-                        maskCtx.rotate(angle + Math.PI);
-                        maskCtx.clearRect(0, -1000, 1000, 2000);
-                        maskCtx.restore();
-                        break;
-                    }
-                case DrawingToolType.Move:
-                    {
-                        if (this.props.editorState.doc.baseLayer?.id.equals(activeLayer.id)) {
-                            return;
-                        }
-
-                        const { x, y } = this.getPositionInCanvas(e);
-                        const dx = (x - mouseDownPosition.x);
-                        const dy = (y - mouseDownPosition.y);
-
-                        return this.props.dispatch(new actions.UpdateDoc(this.props.editorState.doc.updateLayer(activeLayer.id, layer => layer.setPosition({
-                            x: Math.round(layer.position.x + dx / zoom),
-                            y: Math.round(layer.position.y + dy / zoom)
-                        }))));
-                    }
-            }
-
-            this.onDidEditActiveLayer();
-        });
+        document.body.removeEventListener('mouseup', this.onMouseUp);
+        document.body.removeEventListener('touchend', this.onTouchEnd);
     }
 
     render() {
@@ -221,15 +68,19 @@ export class EditorArea extends React.Component<{
         const canvasHeight = Math.ceil(this.props.editorState.doc.height * this.props.editorState.playback.zoom);
 
         return (
-            <div style={{
-                gridArea: 'editor',
-                display: 'flex',
-                flex: 1,
-                overflow: 'scroll',
-                overflowY: 'scroll',
-                userSelect: 'none',
-                border: '10px solid transparent',
-            }}>
+            <div
+                onMouseDown={e => this.onMouseDown(e)}
+                onMouseMove={e => this.onMouseMove(e)}
+                style={{
+                    gridArea: 'editor',
+                    display: 'flex',
+                    flex: 1,
+                    overflow: 'scroll',
+                    overflowY: 'scroll',
+                    userSelect: 'none',
+                    border: '10px solid transparent',
+
+                }}>
                 <canvas
                     width={canvasWidth}
                     height={canvasHeight}
@@ -244,8 +95,202 @@ export class EditorArea extends React.Component<{
         );
     }
 
+    private onMouseDown(e: EventWithPosition): void {
+        const activeLayer = this.getActiveLayer();
+        if (!activeLayer) {
+            return;
+        }
+
+        const editorState = this.props.editorState;
+        const zoom = this.props.editorState.playback.zoom;
+
+        const mouseDownPosition = this.getPositionInCanvas(e);
+        this._activeTool = {
+            tool: editorState.drawSettings.tool,
+            mouseDownPosition: mouseDownPosition,
+            layerMovingShift: vecZero,
+        };
+
+        const maskCtx = activeLayer.maskCtx;
+        maskCtx.fillStyle = 'black';
+        maskCtx.strokeStyle = 'black';
+        maskCtx.lineJoin = maskCtx.lineCap = 'round';
+        maskCtx.lineWidth = editorState.drawSettings.strokeSize / activeLayer.scale.x;
+        maskCtx.globalCompositeOperation = editorState.drawSettings.tool === DrawingToolType.Erase
+            ? 'destination-out'
+            : 'source-over';
+
+        switch (editorState.drawSettings.tool) {
+            case DrawingToolType.Brush:
+            case DrawingToolType.Erase:
+                {
+                    const relativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, zoom);
+                    maskCtx.beginPath();
+                    maskCtx.moveTo(relativePosition.x, relativePosition.y);
+                    maskCtx.lineTo(relativePosition.x, relativePosition.y);
+                    maskCtx.stroke();
+                    this.onDidEditActiveLayer();
+                    break;
+                }
+        }
+    }
+
+    private onMouseMove(e: EventWithPosition) {
+        if (!this._activeTool) {
+            return;
+        }
+
+        const activeLayer = this.getActiveLayer();
+        if (!activeLayer) {
+            return;
+        }
+
+        const maskCtx = activeLayer.maskCtx;
+        const zoom = this.props.editorState.playback.zoom;
+
+        switch (this._activeTool.tool) {
+            case DrawingToolType.Brush:
+            case DrawingToolType.Erase:
+                {
+                    const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
+                    maskCtx.lineTo(x, y);
+                    maskCtx.stroke();
+                    this.onDidEditActiveLayer(/* skipTouch */ true);
+                    break;
+                }
+            case DrawingToolType.Line:
+                {
+                    const mouseDownRelativePosition = this.getPositionInLayer(this._activeTool.mouseDownPosition, activeLayer, zoom);
+                    const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
+                    const dx = mouseDownRelativePosition.x - x;
+                    const dy = mouseDownRelativePosition.y - y;
+                    const angle = Math.atan2(dy, dx);
+
+                    maskCtx.clearRect(0, 0, 10000, 10000);
+
+                    maskCtx.save();
+                    maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
+                    maskCtx.rotate(angle);
+                    maskCtx.fillRect(0, -1000, 1000, 2000);
+                    maskCtx.restore();
+
+                    maskCtx.save();
+                    maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
+                    maskCtx.rotate(angle + Math.PI);
+                    maskCtx.clearRect(0, -1000, 1000, 2000);
+                    maskCtx.restore();
+                    this.onDidEditActiveLayer(/* skipTouch */ true);
+
+                    break;
+                }
+            case DrawingToolType.Move:
+                {
+                    if (activeLayer !== this.props.editorState.doc.baseLayer) {
+                        const { x, y } = this.getPositionInCanvas(e);
+                        const dx = x - this._activeTool.mouseDownPosition.x;
+                        const dy = y - this._activeTool.mouseDownPosition.y;
+                        this._activeTool = {
+                            ...this._activeTool,
+                            layerMovingShift: {
+                                x: Math.round(dx / zoom),
+                                y: Math.round(dy / zoom),
+                            }
+                        };
+                        this.requestCanvasRender();
+                    }
+                    break;
+                }
+        }
+    }
+
+    private readonly onMouseUp = ((e: EventWithPosition) => {
+        if (!this._activeTool) {
+            return;
+        }
+
+        const mouseDownPosition = this._activeTool.mouseDownPosition;
+        this._activeTool = undefined;
+
+        const activeLayer = this.getActiveLayer();
+        if (!activeLayer) {
+            return;
+        }
+
+        const zoom = this.props.editorState.playback.zoom;
+        const mouseDownRelativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, zoom);
+        const maskCtx = activeLayer.maskCtx;
+
+        switch (this.props.editorState.drawSettings.tool) {
+            case DrawingToolType.Brush:
+            case DrawingToolType.Erase:
+                {
+                    maskCtx.closePath();
+                    break;
+                }
+            case DrawingToolType.Line:
+                {
+                    const { x, y } = this.getPositionInLayer(this.getPositionInCanvas(e), activeLayer, zoom);
+                    const dx = mouseDownRelativePosition.x - x;
+                    const dy = mouseDownRelativePosition.y - y;
+                    const angle = Math.atan2(dy, dx);
+
+                    maskCtx.clearRect(0, 0, 10000, 10000);
+
+                    maskCtx.save();
+                    maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
+                    maskCtx.rotate(angle);
+                    maskCtx.fillRect(0, -1000, 1000, 2000);
+                    maskCtx.restore();
+
+                    maskCtx.save();
+                    maskCtx.translate(mouseDownRelativePosition.x, mouseDownRelativePosition.y);
+                    maskCtx.rotate(angle + Math.PI);
+                    maskCtx.clearRect(0, -1000, 1000, 2000);
+                    maskCtx.restore();
+                    break;
+                }
+            case DrawingToolType.Move:
+                {
+                    if (this.props.editorState.doc.baseLayer?.id.equals(activeLayer.id)) {
+                        return;
+                    }
+
+                    const { x, y } = this.getPositionInCanvas(e);
+                    const dx = (x - mouseDownPosition.x);
+                    const dy = (y - mouseDownPosition.y);
+
+                    return this.props.dispatch(new actions.UpdateDoc(this.props.editorState.doc.updateLayer(activeLayer.id, layer => layer.setPosition({
+                        x: Math.round(layer.position.x + dx / zoom),
+                        y: Math.round(layer.position.y + dy / zoom)
+                    }))));
+                }
+        }
+
+        this.onDidEditActiveLayer();
+    }).bind(this);
+
+    private readonly onTouchEnd = ((e: TouchEvent) => {
+        if (e.touches.length === 1) {
+            this.onMouseUp(e.touches[0]);
+        }
+    }).bind(this);
+
+    private readonly onTouchStart = ((e: TouchEvent) => {
+        if (e.touches.length === 1) {
+            this.onMouseDown(e.touches[0]);
+            e.preventDefault();
+        }
+    }).bind(this);
+
+    private readonly onTouchMove = ((e: TouchEvent) => {
+        if (e.touches.length === 1) {
+            this.onMouseMove(e.touches[0]);
+            e.preventDefault();
+        }
+    }).bind(this);
+
     private _renderCanvas() {
-        if (!this._ctx || !this._workingCanvas || !this._workingCtx) {
+        if (!this._ctx || !this._scratchCanvas || !this._scratchCtx) {
             return;
         }
 
@@ -375,17 +420,16 @@ export class EditorArea extends React.Component<{
         };
     }
 
-    private getPositionInCanvas(e: MouseEvent): Vec {
-        const rect = this._canvas!.getBoundingClientRect();
+    private getPositionInCanvas(e: EventWithPosition): Vec {
+        if (!this._canvas) {
+            return vecZero;
+        }
+
+        const rect = this._canvas.getBoundingClientRect();
         return {
             x: (e.clientX - rect.left),
             y: (e.clientY - rect.top),
         };
-    }
-
-    private getActiveLayerMaskCtx(): CanvasRenderingContext2D | undefined {
-        const activeLayer = this.getActiveLayer();
-        return activeLayer?.maskCtx || undefined;
     }
 
     private getActiveLayer(): Layer | undefined {
