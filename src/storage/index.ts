@@ -4,7 +4,7 @@ import { EditorState } from '../model/editorState';
 import { Layer, LayerId } from '../model/layer';
 import { Gif, GifFrame } from '../util/loadGif';
 
-const debug = true;
+const debug = false;
 
 const version = 0;
 

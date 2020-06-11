@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import * as config from '../config';
 
 
-const Link = styled('a')`
+const Link = styled.a`
     color: var(--background-color);
     padding-left: 1.5em;
     

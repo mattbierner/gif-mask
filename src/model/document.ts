@@ -7,10 +7,7 @@ export class Document {
     public static readonly empty = new Document([], 0);
 
     public static fromLayers(layers: Layer[]): Document {
-        let maxLayerId = 0;
-        for (const layer of layers) {
-            maxLayerId = Math.max(maxLayerId, layer.id.value);
-        }
+        const maxLayerId = Math.max(...layers.map(layer => layer.id.value));
         return new Document(layers, maxLayerId + 1);
     }
 

@@ -95,17 +95,14 @@ export class EditorArea extends React.Component<{
     }
 
     private onMouseDown(e: EventWithPosition): void {
-        const activeLayer = this.getActiveLayer();
+        const { activeLayer, drawSettings, playback } = this.props.editorState;
         if (!activeLayer) {
             return;
         }
 
-        const editorState = this.props.editorState;
-        const zoom = this.props.editorState.playback.zoom;
-
         const mouseDownPosition = this.getPositionInCanvas(e);
         this._activeTool = {
-            tool: editorState.drawSettings.tool,
+            tool: drawSettings.tool,
             mouseDownPosition: mouseDownPosition,
             layerMovingShift: vecZero,
         };
@@ -114,16 +111,16 @@ export class EditorArea extends React.Component<{
         maskCtx.fillStyle = 'black';
         maskCtx.strokeStyle = 'black';
         maskCtx.lineJoin = maskCtx.lineCap = 'round';
-        maskCtx.lineWidth = editorState.drawSettings.strokeSize / activeLayer.scale.x;
-        maskCtx.globalCompositeOperation = editorState.drawSettings.tool === DrawingToolType.Erase
+        maskCtx.lineWidth = drawSettings.strokeSize / activeLayer.scale.x;
+        maskCtx.globalCompositeOperation = drawSettings.tool === DrawingToolType.Erase
             ? 'destination-out'
             : 'source-over';
 
-        switch (editorState.drawSettings.tool) {
+        switch (drawSettings.tool) {
             case DrawingToolType.Brush:
             case DrawingToolType.Erase:
                 {
-                    const relativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, zoom);
+                    const relativePosition = this.getPositionInLayer(mouseDownPosition, activeLayer, playback.zoom);
                     maskCtx.beginPath();
                     maskCtx.moveTo(relativePosition.x, relativePosition.y);
                     maskCtx.lineTo(relativePosition.x, relativePosition.y);
@@ -139,7 +136,7 @@ export class EditorArea extends React.Component<{
             return;
         }
 
-        const activeLayer = this.getActiveLayer();
+        const { activeLayer } = this.props.editorState;
         if (!activeLayer) {
             return;
         }
@@ -210,7 +207,7 @@ export class EditorArea extends React.Component<{
         const mouseDownPosition = this._activeTool.mouseDownPosition;
         this._activeTool = undefined;
 
-        const activeLayer = this.getActiveLayer();
+        const { activeLayer } = this.props.editorState;
         if (!activeLayer) {
             return;
         }
@@ -293,7 +290,7 @@ export class EditorArea extends React.Component<{
             return;
         }
 
-        const activeLayer = this.getActiveLayer();
+        const { activeLayer } = this.props.editorState;
         const zoom = this.props.editorState.playback.zoom;
         const shift = this._activeTool?.layerMovingShift ?? vecZero;
 
@@ -321,7 +318,7 @@ export class EditorArea extends React.Component<{
     }
 
     public quickMask(mask: QuickMaskType) {
-        const active = this.getActiveLayer();
+        const active = this.props.editorState.activeLayer;
         if (!active || !active.gif) {
             return;
         }
@@ -377,7 +374,7 @@ export class EditorArea extends React.Component<{
     }
 
     private onDidEditActiveLayer(skipTouch?: boolean) {
-        const activeLayer = this.getActiveLayer();
+        const { activeLayer } = this.props.editorState;
         if (activeLayer && !skipTouch) {
             activeLayer?.touchMask();
             this.props.didTouchLayer();
@@ -413,11 +410,6 @@ export class EditorArea extends React.Component<{
             x: (e.clientX - rect.left),
             y: (e.clientY - rect.top),
         };
-    }
-
-    private getActiveLayer(): Layer | undefined {
-        const editorState = this.props.editorState;
-        return editorState.doc.layers.find(x => editorState.activeLayerId?.equals(x.id));
     }
 
     private getCursor(): string {
