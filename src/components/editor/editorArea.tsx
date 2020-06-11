@@ -4,7 +4,7 @@ import { EditorState, RenderMode } from '../../model/editorState';
 import { Layer } from '../../model/layer';
 import { Vec, vecZero } from '../../model/vec';
 import * as actions from '../../views/main/actions';
-import { render } from './render';
+import { render, renderMask } from './render';
 import ReactDOM = require('react-dom');
 
 interface EventWithPosition {
@@ -20,7 +20,6 @@ interface ActiveToolState {
     readonly mouseDownPosition: Vec;
     readonly layerMovingShift: Vec;
 }
-
 
 export class EditorArea extends React.Component<{
     dispatch: React.Dispatch<actions.Actions>,
@@ -301,24 +300,8 @@ export class EditorArea extends React.Component<{
         this._ctx.clearRect(0, 0, 10000, 10000);
 
         if (this.props.editorState.playback.renderMode === RenderMode.ActiveMask) {
-            if (activeLayer && activeLayer.gif) {
-                this._ctx.save();
-                {
-                    const x = (activeLayer.position.x + shift.x) * zoom;
-                    const y = (activeLayer.position.y + shift.y) * zoom;
-                    const layerWidth = activeLayer.gif.width * activeLayer.scale.x * zoom;
-                    const layerHeight = activeLayer.gif.height * activeLayer.scale.y * zoom;
-
-                    this._ctx.drawImage(activeLayer.mask, x, y, layerWidth, layerHeight);
-                    this._ctx.globalCompositeOperation = 'source-out';
-                    this._ctx.fillStyle = 'black';
-                    this._ctx.fillRect(0, 0, 10000, 10000);
-
-                    this._ctx.globalCompositeOperation = 'source-over';
-                    this._ctx.strokeStyle = 'red';
-                    this._ctx.strokeRect(x - 1, y - 1, layerWidth + 2, layerHeight + 2);
-                }
-                this._ctx.restore();
+            if (activeLayer) {
+                renderMask(activeLayer, shift, zoom, this._ctx);
             }
         } else {
             let docToRender = this.props.editorState.doc;
@@ -371,25 +354,25 @@ export class EditorArea extends React.Component<{
 
     private showLeft(layer: Layer): void {
         this.revealAll(layer);
-        layer.maskCtx.clearRect(layer.gif!.width / 2, 0, layer.gif!.width, layer.gif!.height);
+        layer.maskCtx.clearRect(layer.width / 2, 0, layer.width, layer.height);
         this.onDidEditActiveLayer();
     }
 
     private showRight(layer: Layer): void {
         this.revealAll(layer);
-        layer.maskCtx.clearRect(0, 0, layer.gif!.width / 2, layer.gif!.height);
+        layer.maskCtx.clearRect(0, 0, layer.width / 2, layer.height);
         this.onDidEditActiveLayer();
     }
 
     private showTop(layer: Layer): void {
         this.revealAll(layer);
-        layer.maskCtx.clearRect(0, layer.gif!.height / 2, layer.gif!.width, layer.gif!.height / 2);
+        layer.maskCtx.clearRect(0, layer.height / 2, layer.width, layer.height / 2);
         this.onDidEditActiveLayer();
     }
 
     private showBottom(layer: Layer): void {
         this.revealAll(layer);
-        layer.maskCtx.clearRect(0, 0, layer.gif!.width, layer.gif!.height / 2);
+        layer.maskCtx.clearRect(0, 0, layer.width, layer.height / 2);
         this.onDidEditActiveLayer();
     }
 

@@ -95,7 +95,6 @@ export function reducer(state: AppState, action: actions.Actions): AppState {
             {
                 return new Ready(action.state);
             }
-
         default:
             if (state.type === AppStage.Ready) {
                 return new Ready(editorStateReducer(state.editorState, action));

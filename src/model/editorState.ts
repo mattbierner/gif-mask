@@ -41,9 +41,6 @@ export class EditorState {
     ) { }
 
     public get currentFrame(): GifFrame | undefined {
-        if (!this.doc.layers.length) {
-            return undefined;
-        }
         return this.doc.baseLayer?.gif?.frames[this.playback.currentFrameIndex];
     }
 
@@ -59,6 +56,10 @@ export class EditorState {
         return new EditorState(this.doc, this.drawSettings, this.playback, layerId);
     }
 
+    public updatePlayback(settings: PlaybackSettings) {
+        return new EditorState(this.doc, this.drawSettings, settings, this.activeLayerId);
+    }
+
     public setPlaying(playing: boolean): EditorState {
         if (playing === this.playback.playing) {
             return this;
@@ -72,13 +73,5 @@ export class EditorState {
             ...this.playback,
             currentFrameIndex: frame < 0 ? this.doc.frameCount + frame : frame,
         });
-    }
-
-    public advanceFrame(): EditorState {
-        return this.setActiveFrame(this.playback.currentFrameIndex + 1);
-    }
-
-    public updatePlayback(settings: PlaybackSettings) {
-        return new EditorState(this.doc, this.drawSettings, settings, this.activeLayerId);
     }
 }

@@ -172,7 +172,7 @@ export function LayerView(props: {
 
             <TimelineFrames
                 dispatch={props.dispatch}
-                model={props.model}
+                doc={props.model}
                 layer={props.layer}
                 currentFrame={props.currentFrame} />
 

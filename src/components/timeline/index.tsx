@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AppStage, AppState } from '../../model/appState';
-import { Layer, LayerId } from '../../model/layer';
+import { LayerId } from '../../model/layer';
 import { Gif } from '../../util/loadGif';
 import * as actions from '../../views/main/actions';
 import { PlaybackControls } from '../editor/playbackControls';
@@ -19,10 +19,6 @@ export function Timeline(props: {
     const [state, setState] = React.useState<TimelineState>({
         showGifPickerFor: undefined
     });
-
-    function onSelectGif(layer: Layer) {
-        setState({ showGifPickerFor: layer.id });
-    }
 
     function didSelectGif(gif: Gif | undefined): void {
         if (!state.showGifPickerFor) {
@@ -52,7 +48,9 @@ export function Timeline(props: {
                 renderMode={editorState.playback.renderMode}
                 dispatch={props.dispatch}
                 currentFrame={editorState.playback.currentFrameIndex}
-                onSelectGif={layer => onSelectGif(layer)} />
+                onSelectGif={layer => {
+                    setState({ showGifPickerFor: layer.id });
+                }} />
         ));
 
         body = (

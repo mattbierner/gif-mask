@@ -1,5 +1,6 @@
 import { Document } from '../../model/document';
-import { LayerId } from '../../model/layer';
+import { Layer, LayerId } from '../../model/layer';
+import { Vec as Vec2 } from '../../model/vec';
 
 const getScratchCanvas = (() => {
     let canvas: HTMLCanvasElement | undefined;
@@ -13,14 +14,16 @@ const getScratchCanvas = (() => {
     };
 })();
 
+interface RenderOptions {
+    readonly showBordersFor?: readonly LayerId[];
+}
+
 export function render(
     doc: Document,
     currentFrameIndex: number,
     zoom: number,
     outCtx: CanvasRenderingContext2D,
-    options: {
-        showBordersFor?: readonly LayerId[],
-    } = {},
+    options: RenderOptions = {},
 ) {
     let { width, height } = doc;
     width *= zoom;
@@ -90,4 +93,29 @@ export function render(
             outCtx.stroke();
         }
     }
+}
+
+export function renderMask(
+    activeLayer: Layer,
+    shift: Vec2,
+    zoom: number,
+    outCtx: CanvasRenderingContext2D,
+) {
+    outCtx.save();
+    {
+        const x = (activeLayer.position.x + shift.x) * zoom;
+        const y = (activeLayer.position.y + shift.y) * zoom;
+        const layerWidth = activeLayer.width * activeLayer.scale.x * zoom;
+        const layerHeight = activeLayer.height * activeLayer.scale.y * zoom;
+
+        outCtx.drawImage(activeLayer.mask, x, y, layerWidth, layerHeight);
+        outCtx.globalCompositeOperation = 'source-out';
+        outCtx.fillStyle = 'black';
+        outCtx.fillRect(0, 0, 10000, 10000);
+
+        outCtx.globalCompositeOperation = 'source-over';
+        outCtx.strokeStyle = 'red';
+        outCtx.strokeRect(x - 1, y - 1, layerWidth + 2, layerHeight + 2);
+    }
+    outCtx.restore();
 }
