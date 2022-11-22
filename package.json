@@ -38,7 +38,7 @@
     "typescript": "^3.9.3",
     "webpack": "^4.43.0",
     "@types/lodash.throttle": "^4.1.6",
-    "webpack-cli": "^3.3.0"
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "@material-ui/core": "^4.10.0",
